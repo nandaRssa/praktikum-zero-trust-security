@@ -28,18 +28,18 @@ function seedDatabase(db = getDatabase()) {
   `);
 
   const adminResult = insertUser.run('admin1', passwordHash, 'admin', 'ADM001', 'Administrator Akademik');
-  const dosen1Result = insertUser.run('dosen_budi', passwordHash, 'dosen', '0401018001', 'Dr. Budi Santoso, M.Kom.');
+  const dosen1Result = insertUser.run('dosen_fahri', passwordHash, 'dosen', '0401018001', 'Dr. Fahri Hidayat, M.Kom.');
   const dosen2Result = insertUser.run('dosen_siti', passwordHash, 'dosen', '0402028202', 'Dr. Siti Aminah, M.T.');
   const mhs1Result = insertUser.run('mhs_andi', passwordHash, 'mahasiswa', '227006001', 'Andi Pratama');
-  const mhs2Result = insertUser.run('mhs_bima', passwordHash, 'mahasiswa', '227006002', 'Bima Arya');
-  const mhs3Result = insertUser.run('mhs_citra', passwordHash, 'mahasiswa', '227006003', 'Citra Lestari');
+  const mhs2Result = insertUser.run('mhs_arhan', passwordHash, 'mahasiswa', '227006002', 'Arhan Maulana');
+  const mhs3Result = insertUser.run('mhs_yuli', passwordHash, 'mahasiswa', '227006003', 'Yuli Rahmawati');
 
   const adminId = adminResult.lastInsertRowid;
-  const dosenBudiId = dosen1Result.lastInsertRowid;
+  const dosenFahriId = dosen1Result.lastInsertRowid;
   const dosenSitiId = dosen2Result.lastInsertRowid;
   const mhsAndiId = mhs1Result.lastInsertRowid;
-  const mhsBimaId = mhs2Result.lastInsertRowid;
-  const mhsCitraId = mhs3Result.lastInsertRowid;
+  const mhsArhanId = mhs2Result.lastInsertRowid;
+  const mhsYuliId = mhs3Result.lastInsertRowid;
 
   // 2. Seed Registered Devices (Setiap user memiliki 1 device terdaftar)
   const insertDevice = db.prepare(`
@@ -48,11 +48,11 @@ function seedDatabase(db = getDatabase()) {
   `);
 
   insertDevice.run(adminId, 'DEV-ADMIN-01', 'Laptop Admin ThinkPad');
-  insertDevice.run(dosenBudiId, 'DEV-DOSEN-01', 'MacBook Pro Dosen Budi');
+  insertDevice.run(dosenFahriId, 'DEV-DOSEN-01', 'MacBook Pro Dosen Fahri');
   insertDevice.run(dosenSitiId, 'DEV-DOSEN-02', 'Dell XPS Dosen Siti');
   insertDevice.run(mhsAndiId, 'DEV-MHS-01', 'Asus ROG Andi');
-  insertDevice.run(mhsBimaId, 'DEV-MHS-02', 'MacBook Air Bima');
-  insertDevice.run(mhsCitraId, 'DEV-MHS-03', 'HP Pavilion Citra');
+  insertDevice.run(mhsArhanId, 'DEV-MHS-02', 'MacBook Air Arhan');
+  insertDevice.run(mhsYuliId, 'DEV-MHS-03', 'HP Pavilion Yuli');
 
   // 3. Seed Service Client (Service Nilai)
   const insertClient = db.prepare(`
@@ -67,7 +67,7 @@ function seedDatabase(db = getDatabase()) {
     VALUES (?, ?, ?, ?, ?)
   `);
 
-  const kelas1Result = insertKelas.run('IF301', 'Keamanan Informasi', 3, dosenBudiId, 0); // Diampu Dosen Budi
+  const kelas1Result = insertKelas.run('IF301', 'Keamanan Informasi', 3, dosenFahriId, 0); // Diampu Dosen Fahri
   const kelas2Result = insertKelas.run('IF302', 'Kriptografi', 3, dosenSitiId, 0);          // Diampu Dosen Siti
 
   const kelas1Id = kelas1Result.lastInsertRowid;
@@ -79,13 +79,13 @@ function seedDatabase(db = getDatabase()) {
     VALUES (?, ?, ?, ?)
   `);
 
-  // Nilai kelas Keamanan Informasi (Dosen Budi): Andi & Bima
+  // Nilai kelas Keamanan Informasi (Dosen Fahri): Andi & Arhan
   insertNilai.run(kelas1Id, mhsAndiId, 85.5, 'A');
-  insertNilai.run(kelas1Id, mhsBimaId, 75.0, 'B');
+  insertNilai.run(kelas1Id, mhsArhanId, 75.0, 'B');
 
-  // Nilai kelas Kriptografi (Dosen Siti): Bima & Citra
-  insertNilai.run(kelas2Id, mhsBimaId, 88.0, 'A');
-  insertNilai.run(kelas2Id, mhsCitraId, 82.0, 'B');
+  // Nilai kelas Kriptografi (Dosen Siti): Arhan & Yuli
+  insertNilai.run(kelas2Id, mhsArhanId, 88.0, 'A');
+  insertNilai.run(kelas2Id, mhsYuliId, 82.0, 'B');
 
   console.log('[SEED] Seeding selesai dengan sukses!');
   console.log('       - 1 Admin, 2 Dosen, 3 Mahasiswa dibuat.');

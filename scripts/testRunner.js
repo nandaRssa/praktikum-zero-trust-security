@@ -105,18 +105,18 @@ async function runTests() {
     const andiToken = andiData.accessToken;
     const andiRefreshToken = andiData.refreshToken;
 
-    // D. Login Dosen Budi dengan device terdaftar -> BERHASIL
-    const loginBudi = await fetch(`${gwUrl}/auth/login`, {
+    // D. Login Dosen Fahri dengan device terdaftar -> BERHASIL
+    const loginFahri = await fetch(`${gwUrl}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Device-ID': 'DEV-DOSEN-01'
       },
-      body: JSON.stringify({ username: 'dosen_budi', password: 'password123' })
+      body: JSON.stringify({ username: 'dosen_fahri', password: 'password123' })
     });
-    const budiData = await loginBudi.json();
-    assert(loginBudi.status === 200 && budiData.accessToken, 'Login Dosen Budi dengan device terdaftar berhasil');
-    const budiToken = budiData.accessToken;
+    const fahriData = await loginFahri.json();
+    assert(loginFahri.status === 200 && fahriData.accessToken, 'Login Dosen Fahri dengan device terdaftar berhasil');
+    const fahriToken = fahriData.accessToken;
 
     // E. Login Dosen Siti dengan device terdaftar -> BERHASIL
     const loginSiti = await fetch(`${gwUrl}/auth/login`, {
@@ -185,12 +185,12 @@ async function runTests() {
     console.log(cyan('\n--- 3. UJI KEBIJAKAN AKSES NILAI (LEAST PRIVILEGE & OWNERSHIP) ---'));
 
     // Ambil data referensi dari database
-    const kelasBudi = db.prepare("SELECT * FROM kelas WHERE kode_mk = 'IF301'").get();
+    const kelasFahri = db.prepare("SELECT * FROM kelas WHERE kode_mk = 'IF301'").get();
     const kelasSiti = db.prepare("SELECT * FROM kelas WHERE kode_mk = 'IF302'").get();
-    const nilaiBudi = db.prepare("SELECT * FROM nilai WHERE kelas_id = ?").get(kelasBudi.id);
+    const nilaiFahri = db.prepare("SELECT * FROM nilai WHERE kelas_id = ?").get(kelasFahri.id);
     const nilaiSiti = db.prepare("SELECT * FROM nilai WHERE kelas_id = ?").get(kelasSiti.id);
     const mhsAndi = db.prepare("SELECT * FROM users WHERE username = 'mhs_andi'").get();
-    const mhsBima = db.prepare("SELECT * FROM users WHERE username = 'mhs_bima'").get();
+    const mhsArhan = db.prepare("SELECT * FROM users WHERE username = 'mhs_arhan'").get();
 
     // A. Mahasiswa Andi akses GET /nilai dari device terdaftar -> Hanya melihat nilai miliknya
     const andiNilaiRes = await fetch(`${gwUrl}/nilai`, {
@@ -206,20 +206,20 @@ async function runTests() {
       'Mahasiswa Andi hanya melihat nilai mata kuliah miliknya sendiri'
     );
 
-    // B. Dosen Budi akses GET /nilai dari device terdaftar -> Hanya melihat kelas yang diampunya (IF301)
-    const budiNilaiRes = await fetch(`${gwUrl}/nilai`, {
+    // B. Dosen Fahri akses GET /nilai dari device terdaftar -> Hanya melihat kelas yang diampunya (IF301)
+    const fahriNilaiRes = await fetch(`${gwUrl}/nilai`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${budiToken}`,
+        'Authorization': `Bearer ${fahriToken}`,
         'X-Device-ID': 'DEV-DOSEN-01'
       }
     });
-    const budiNilaiData = await budiNilaiRes.json();
-    const allBudiClasses = budiNilaiData.data && budiNilaiData.data.every(d => d.kode_mk === 'IF301');
-    assert(budiNilaiRes.status === 200 && allBudiClasses, 'Dosen Budi hanya melihat kelas yang diampunya (IF301)');
+    const fahriNilaiData = await fahriNilaiRes.json();
+    const allFahriClasses = fahriNilaiData.data && fahriNilaiData.data.every(d => d.kode_mk === 'IF301');
+    assert(fahriNilaiRes.status === 200 && allFahriClasses, 'Dosen Fahri hanya melihat kelas yang diampunya (IF301)');
 
     // C. Mahasiswa mencoba mengubah nilai (PUT /nilai/:id) -> HARUS DITOLAK (403)
-    const mhsEditNilai = await fetch(`${gwUrl}/nilai/${nilaiBudi.id}`, {
+    const mhsEditNilai = await fetch(`${gwUrl}/nilai/${nilaiFahri.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -230,52 +230,52 @@ async function runTests() {
     });
     assert(mhsEditNilai.status === 403, 'Mahasiswa dilarang mengubah nilai (HTTP 403 Role Forbidden)');
 
-    // D. Dosen Budi mencoba mengubah nilai kelas Dosen Siti -> HARUS DITOLAK (403 Not Class Owner)
-    const budiEditSiti = await fetch(`${gwUrl}/nilai/${nilaiSiti.id}`, {
+    // D. Dosen Fahri mencoba mengubah nilai kelas Dosen Siti -> HARUS DITOLAK (403 Not Class Owner)
+    const fahriEditSiti = await fetch(`${gwUrl}/nilai/${nilaiSiti.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${budiToken}`,
+        'Authorization': `Bearer ${fahriToken}`,
         'X-Device-ID': 'DEV-DOSEN-01'
       },
       body: JSON.stringify({ nilai_angka: 95 })
     });
-    assert(budiEditSiti.status === 403, 'Dosen dilarang mengubah nilai kelas yang bukan diampunya (HTTP 403 Not Class Owner)');
+    assert(fahriEditSiti.status === 403, 'Dosen dilarang mengubah nilai kelas yang bukan diampunya (HTTP 403 Not Class Owner)');
 
-    // E. Dosen Budi mengubah nilai di luar jam akses (simulasi jam 22.00) -> HARUS DITOLAK (403)
-    const budiEditOffHours = await fetch(`${gwUrl}/nilai/${nilaiBudi.id}`, {
+    // E. Dosen Fahri mengubah nilai di luar jam akses (simulasi jam 22.00) -> HARUS DITOLAK (403)
+    const fahriEditOffHours = await fetch(`${gwUrl}/nilai/${nilaiFahri.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${budiToken}`,
+        'Authorization': `Bearer ${fahriToken}`,
         'X-Device-ID': 'DEV-DOSEN-01',
         'X-Simulate-Hour': '22' // Jam 22.00 di luar 07.00-21.00
       },
       body: JSON.stringify({ nilai_angka: 90 })
     });
-    assert(budiEditOffHours.status === 403, 'Perubahan nilai di luar jam akses (07.00-21.00) ditolak (HTTP 403 Outside Hours)');
+    assert(fahriEditOffHours.status === 403, 'Perubahan nilai di luar jam akses (07.00-21.00) ditolak (HTTP 403 Outside Hours)');
 
-    // F. Dosen Budi mengubah nilai dalam jam akses (simulasi jam 10.00) -> BERHASIL (200)
-    const budiEditValid = await fetch(`${gwUrl}/nilai/${nilaiBudi.id}`, {
+    // F. Dosen Fahri mengubah nilai dalam jam akses (simulasi jam 10.00) -> BERHASIL (200)
+    const fahriEditValid = await fetch(`${gwUrl}/nilai/${nilaiFahri.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${budiToken}`,
+        'Authorization': `Bearer ${fahriToken}`,
         'X-Device-ID': 'DEV-DOSEN-01',
         'X-Simulate-Hour': '10' // Jam 10.00 dalam jam akses
       },
       body: JSON.stringify({ nilai_angka: 92.0 })
     });
-    const editData = await budiEditValid.json();
-    assert(budiEditValid.status === 200 && editData.data.nilai_angka === 92.0, 'Dosen Budi berhasil mengubah nilai dalam jam akses');
+    const editData = await fahriEditValid.json();
+    assert(fahriEditValid.status === 200 && editData.data.nilai_angka === 92.0, 'Dosen Fahri berhasil mengubah nilai dalam jam akses');
 
     // -------------------------------------------------------------
     // PENGUJIAN 4: FINALISASI KELAS & PANGGILAN ANTAR-SERVICE KE TRANSKRIP
     // -------------------------------------------------------------
     console.log(cyan('\n--- 4. UJI FINALISASI KELAS & SINKRONISASI TRANSKRIP (INTER-SERVICE) ---'));
 
-    // A. Dosen Siti mencoba memfinalisasi kelas Dosen Budi -> HARUS DITOLAK (403)
-    const sitiFinalizeBudi = await fetch(`${gwUrl}/kelas/${kelasBudi.id}/finalisasi`, {
+    // A. Dosen Siti mencoba memfinalisasi kelas Dosen Fahri -> HARUS DITOLAK (403)
+    const sitiFinalizeFahri = await fetch(`${gwUrl}/kelas/${kelasFahri.id}/finalisasi`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${sitiToken}`,
@@ -283,13 +283,13 @@ async function runTests() {
         'X-Simulate-Hour': '11'
       }
     });
-    assert(sitiFinalizeBudi.status === 403, 'Dosen Siti dilarang memfinalisasi kelas yang diampu Dosen Budi');
+    assert(sitiFinalizeFahri.status === 403, 'Dosen Siti dilarang memfinalisasi kelas yang diampu Dosen Fahri');
 
-    // B. Dosen Budi finalisasi kelas IF301 dalam jam akses -> BERHASIL & Antar-service sinkron ke Transkrip
-    const finalizeRes = await fetch(`${gwUrl}/kelas/${kelasBudi.id}/finalisasi`, {
+    // B. Dosen Fahri finalisasi kelas IF301 dalam jam akses -> BERHASIL & Antar-service sinkron ke Transkrip
+    const finalizeRes = await fetch(`${gwUrl}/kelas/${kelasFahri.id}/finalisasi`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${budiToken}`,
+        'Authorization': `Bearer ${fahriToken}`,
         'X-Device-ID': 'DEV-DOSEN-01',
         'X-Simulate-Hour': '11'
       }
@@ -301,11 +301,11 @@ async function runTests() {
     );
 
     // C. Coba ubah nilai pada kelas yang sudah difinalisasi -> HARUS DITOLAK (403)
-    const editAfterFinal = await fetch(`${gwUrl}/nilai/${nilaiBudi.id}`, {
+    const editAfterFinal = await fetch(`${gwUrl}/nilai/${nilaiFahri.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${budiToken}`,
+        'Authorization': `Bearer ${fahriToken}`,
         'X-Device-ID': 'DEV-DOSEN-01',
         'X-Simulate-Hour': '12'
       },
@@ -314,10 +314,10 @@ async function runTests() {
     assert(editAfterFinal.status === 403, 'Nilai pada kelas yang sudah difinalisasi dilarang diubah (HTTP 403)');
 
     // D. Finalisasi ulang kelas yang sudah final -> HARUS DITOLAK (403)
-    const reFinalize = await fetch(`${gwUrl}/kelas/${kelasBudi.id}/finalisasi`, {
+    const reFinalize = await fetch(`${gwUrl}/kelas/${kelasFahri.id}/finalisasi`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${budiToken}`,
+        'Authorization': `Bearer ${fahriToken}`,
         'X-Device-ID': 'DEV-DOSEN-01',
         'X-Simulate-Hour': '12'
       }
@@ -343,17 +343,17 @@ async function runTests() {
       'Mahasiswa Andi berhasil melihat transkrip miliknya sendiri (terisi otomatis dari sinkronisasi)'
     );
 
-    // B. Mahasiswa Andi mencoba mengintip transkrip Mahasiswa Bima (NIM: 227006002) -> HARUS DITOLAK (403)
-    const andiPeekBima = await fetch(`${gwUrl}/transkrip/227006002`, {
+    // B. Mahasiswa Andi mencoba mengintip transkrip Mahasiswa Arhan (NIM: 227006002) -> HARUS DITOLAK (403)
+    const andiPeekArhan = await fetch(`${gwUrl}/transkrip/227006002`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${andiToken}`,
         'X-Device-ID': 'DEV-MHS-01'
       }
     });
-    assert(andiPeekBima.status === 403, 'Mahasiswa dilarang melihat transkrip mahasiswa lain (NIM Mismatch HTTP 403)');
+    assert(andiPeekArhan.status === 403, 'Mahasiswa dilarang melihat transkrip mahasiswa lain (NIM Mismatch HTTP 403)');
 
-    // C. Admin melihat transkrip Andi dan Bima -> BERHASIL SEMUA
+    // C. Admin melihat transkrip Andi dan Arhan -> BERHASIL SEMUA
     const adminViewAndi = await fetch(`${gwUrl}/transkrip/227006001`, {
       method: 'GET',
       headers: {
@@ -361,21 +361,21 @@ async function runTests() {
         'X-Device-ID': 'DEV-ADMIN-01'
       }
     });
-    const adminViewBima = await fetch(`${gwUrl}/transkrip/227006002`, {
+    const adminViewArhan = await fetch(`${gwUrl}/transkrip/227006002`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${adminToken}`,
         'X-Device-ID': 'DEV-ADMIN-01'
       }
     });
-    assert(adminViewAndi.status === 200 && adminViewBima.status === 200, 'Admin berhak melihat transkrip seluruh mahasiswa');
+    assert(adminViewAndi.status === 200 && adminViewArhan.status === 200, 'Admin berhak melihat transkrip seluruh mahasiswa');
 
-    // D. User biasa (Dosen Budi) mencoba memanggil POST /transkrip/sinkron -> HARUS DITOLAK (403)
+    // D. User biasa (Dosen Fahri) mencoba memanggil POST /transkrip/sinkron -> HARUS DITOLAK (403)
     const userCallSync = await fetch(`${gwUrl}/transkrip/sinkron`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${budiToken}`,
+        'Authorization': `Bearer ${fahriToken}`,
         'X-Device-ID': 'DEV-DOSEN-01'
       },
       body: JSON.stringify({ items: [] })
@@ -392,8 +392,8 @@ async function runTests() {
       body: JSON.stringify({
         items: [
           {
-            mahasiswa_id: mhsBima.id,
-            nim: mhsBima.identifier,
+            mahasiswa_id: mhsArhan.id,
+            nim: mhsArhan.identifier,
             kode_mk: 'IF999',
             nama_mk: 'Praktikum Zero Trust',
             sks: 3,

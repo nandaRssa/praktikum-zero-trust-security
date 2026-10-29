@@ -48,7 +48,7 @@
           }
         },
         {
-          "name": "1.3 Login Dosen Budi (Device Terdaftar - Sukses)",
+          "name": "1.3 Login Dosen Fahri (Device Terdaftar - Sukses)",
           "request": {
             "method": "POST",
             "header": [
@@ -57,7 +57,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"dosen_budi\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"username\": \"dosen_fahri\",\n  \"password\": \"password123\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
           }
