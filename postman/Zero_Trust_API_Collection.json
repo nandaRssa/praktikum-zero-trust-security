@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "Zero Trust Security - Keamanan Informasi UNSIL",
-    "_postman_id": "zero-trust-unsil-2024",
-    "description": "Koleksi API Postman untuk Tugas Praktikum Individu Zero Trust Security (NIST SP 800-207) - Informatika Universitas Siliwangi",
+    "name": "Zero Trust Security API",
+    "_postman_id": "zero-trust-security-2024",
+    "description": "Koleksi API Postman untuk pengujian sistem Zero Trust Security berbasis NIST SP 800-207.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -19,6 +19,23 @@
       "item": [
         {
           "name": "1.1 Login Mahasiswa Andi (Device Terdaftar - Sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token && jsonData.token.accessToken) {",
+                  "  pm.collectionVariables.set('tokenMhs', jsonData.token.accessToken);",
+                  "}",
+                  "if (jsonData.refreshToken) {",
+                  "  pm.collectionVariables.set('refreshTokenMhs', jsonData.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -49,6 +66,20 @@
         },
         {
           "name": "1.3 Login Dosen Fahri (Device Terdaftar - Sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token && jsonData.token.accessToken) {",
+                  "  pm.collectionVariables.set('tokenDosen', jsonData.token.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -64,6 +95,20 @@
         },
         {
           "name": "1.4 Login Admin (Device Terdaftar - Sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token && jsonData.token.accessToken) {",
+                  "  pm.collectionVariables.set('tokenAdmin', jsonData.token.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -103,6 +148,20 @@
         },
         {
           "name": "1.7 Penerbitan Service Token (Service Nilai)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token && jsonData.token.accessToken) {",
+                  "  pm.collectionVariables.set('serviceToken', jsonData.token.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],

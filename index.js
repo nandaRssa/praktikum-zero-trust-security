@@ -6,8 +6,7 @@ const serviceTranskrip = require('./src/services/transkrip');
 const config = require('./src/config');
 
 console.log('='.repeat(60));
-console.log('  SISTEM NILAI & TRANSKRIP - ZERO TRUST SECURITY ARCHITECTURE');
-console.log('  Informatika Universitas Siliwangi (KP70065004)');
+console.log('  SISTEM NILAI & TRANSKRIP - ZERO TRUST ARCHITECTURE');
 console.log('='.repeat(60));
 
 // Pastikan database siap dan terisi seed

@@ -1,7 +1,7 @@
 {
-  "name": "zero_trust_unsil",
+  "name": "zero-trust-security",
   "version": "1.0.0",
-  "description": "Tugas Praktikum Individu Zero Trust Security - Keamanan Informasi Universitas Siliwangi",
+  "description": "Implementasi Arsitektur Zero Trust Security pada Layanan Nilai dan Transkrip",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -18,10 +18,9 @@
     "api-gateway",
     "policy-enforcement-point",
     "express",
-    "jwt",
-    "unsil"
+    "jwt"
   ],
-  "author": "Mahasiswa Informatika UNSIL",
+  "author": "Mahasiswa",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

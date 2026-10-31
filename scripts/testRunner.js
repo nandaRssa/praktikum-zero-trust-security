@@ -28,7 +28,7 @@ function assert(condition, testName, details = '') {
 
 async function runTests() {
   console.log(bold('\n============================================================='));
-  console.log(bold('  MENJALANKAN AUTOMATED TEST SUITE: ZERO TRUST SECURITY (UNSIL)'));
+  console.log(bold('  MENJALANKAN AUTOMATED TEST SUITE: ZERO TRUST SECURITY'));
   console.log(bold('=============================================================\n'));
 
   // 1. Inisialisasi DB & Server
@@ -427,17 +427,15 @@ async function runTests() {
   }
 
   // Tampilkan Rangkuman
-  console.log(bold('\n============================================================='));
   console.log(bold('  RANGKUMAN HASIL PENGUJIAN:'));
   console.log(`  Total Pengujian : ${passedCount + failedCount}`);
   console.log(`  ${green('LULUS (PASS)')}   : ${passedCount}`);
   console.log(`  ${red('GAGAL (FAIL)')}   : ${failedCount}`);
   if (failedCount === 0) {
-    console.log(green(bold('\n  🎉 SEMPURNA! SELURUH PRINSIP ZERO TRUST & SKENARIO LULUS 100%!\n')));
+    console.log(green(bold('\n  SELURUH PRINSIP ZERO TRUST & SKENARIO BERHASIL\n')));
   } else {
     console.log(red(bold('\n  Terdapat pengujian yang gagal, silakan periksa rincian di atas.\n')));
   }
-  console.log(bold('=============================================================\n'));
 
   process.exit(failedCount === 0 ? 0 : 1);
 }
